@@ -64,16 +64,26 @@ i{display:inline-block;width:8px;height:8px;border-radius:50%;flex:none}
 }
 @media(prefers-reduced-motion:reduce){#rg::after{animation:none}}
 </style></head><body>
+<svg style="position:absolute;width:0;height:0;overflow:hidden" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="icon-back" viewBox="0 0 24 24"><path fill="currentColor" d="M15 18l-6-6 6-6"/></symbol>
+  <symbol id="icon-home" viewBox="0 0 24 24"><path fill="currentColor" d="M10 20v-6h4v6h5v-8l-5-5-5 5v8z"/></symbol>
+  <symbol id="icon-moon" viewBox="0 0 24 24"><path fill="currentColor" d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.42-.01-.82-.02-1.22l.48-.64c.25-.34.66-.52 1.06-.38.38.13.58.59.38 1.06l-.64.48C17.18 19.99 16.78 20 16.36 20c-4.96 0-9-4.04-9-9s4.04-9 9-9c.42 0 .82.01 1.22.02l-.48-.64c-.34-.25-.52-.66-.38-1.06.13-.38.59-.58 1.06-.38l.64.48C19.99 4.82 20 5.22 20 5.64c0 4.96-4.04 9-9 9"/></symbol>
+  <symbol id="icon-mars" viewBox="0 0 24 24"><circle fill="#e74c3c" cx="12" cy="12" r="9"/><path fill="none" stroke="#c0392b" stroke-width="1.5" d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z"/></symbol>
+  <symbol id="icon-earth" viewBox="0 0 24 24"><circle fill="none" stroke="currentColor" stroke-width="2" cx="12" cy="12" r="9"/><path fill="currentColor" d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.42-.01-.82-.02-1.22z"/></symbol>
+  <symbol id="icon-astronaut" viewBox="0 0 24 24"><path fill="currentColor" d="M12 3a3 3 0 0 0-3 3v3a1 1 0 0 0-1 1v3a1 1 0 0 0-1 1h2v2h4v-2h2a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1v-3a3 3 0 0 0-3-3zm-1 10a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-1h4v1z"/></symbol>
+  <symbol id="icon-rocket" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2l-1 6h-2l1 6h6l1-6h-2z"/></symbol>
+</svg>
+<style>.icon{width:18px;height:18px;flex-shrink:0;display:inline-block;vertical-align:middle}</style>
 <nav class="nav-top">
-  <button class="nav-back" onclick="goBack()">← Retour</button>
-  <a href="space_memory_accueil_interactif.html" class="nav-home">🏠 Accueil</a>
-  <a href="space_memory_mission.html" class="nav-tab">🚀 Mission Sojourner</a>
+  <button class="nav-back" onclick="goBack()"><svg class="icon"><use href="#icon-back"/></svg><span>Retour</span></button>
+  <a href="space_memory_accueil_interactif.html" class="nav-home"><svg class="icon"><use href="#icon-home"/></svg><span>Accueil</span></a>
+  <a href="space_memory_mission.html" class="nav-tab"><svg class="icon"><use href="#icon-rocket"/></svg><span>Mission Sojourner</span></a>
   <div class="nav-spacer"></div>
-  <a href="lune-3d.html" class="nav-tab">🌙 Lune</a>
-  <a href="mars-3d.html" class="nav-tab">🔴 Mars</a>
-<a href="terre-lune-mars.html" class="nav-tab">🌍 Terre</a>
+  <a href="lune-3d.html" class="nav-tab"><svg class="icon"><use href="#icon-moon"/></svg><span>Lune</span></a>
+  <a href="mars-3d.html" class="nav-tab"><svg class="icon"><use href="#icon-mars"/></svg><span>Mars</span></a>
+<a href="terre-lune-mars.html" class="nav-tab"><svg class="icon"><use href="#icon-earth"/></svg><span>Terre</span></a>
   <div class="nav-spacer"></div>
-  <a href="space_memory_profil.html" class="nav-profile"><span class="nav-ava">🧑🏽‍🚀</span><span>Mon profil</span></a>
+  <a href="space_memory_profil.html" class="nav-profile"><svg class="icon"><use href="#icon-astronaut"/></svg><span>Mon profil</span></a>
 </nav>
 <canvas id="c" tabindex="0" aria-label="Globe 3D interactif"></canvas>
 <div id="lbs"></div><div id="rg"></div><div id="tp"></div>
