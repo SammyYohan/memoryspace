@@ -88,23 +88,23 @@ const TX={};const gen=[['sun',fSun,0],['mercury',fRocky,0],['venus',base(.85,.75
 let gi=0;for(const [k,f,al] of gen){TX[k]=tx(f,al);prog((++gi)/gen.length);await tick()}
 const sphere=(r,m)=>{const s=new THREE.Mesh(new THREE.SphereGeometry(r,64,48),m);S.add(s);return s};
 const sm=(m,b)=>new THREE.MeshStandardMaterial({map:m,roughness:1,bumpMap:b?m:null,bumpScale:b||0});
-const PL={sun:{r:14,orb:0,w:0,n:'Soleil',travel:false,type:'sun',m:sphere(14,new THREE.MeshBasicMaterial({map:TX.sun,color:0xffffff}))},
-mercury:{r:0.75,orb:24,w:.045,n:'Mercure',travel:false,type:'rocky',m:sphere(0.75,sm(TX.mercury,.5))},
-venus:{r:1.7,orb:36,w:.03,n:'Vénus',travel:false,type:'rocky',m:sphere(1.7,sm(TX.venus,.4))},
-earth:{r:2,orb:52,w:.025,n:'Terre',travel:true,type:'earth',m:sphere(2,sm(TX.earth,.6))},
-moon:{r:0.55,orb:5,w:.16,n:'Lune',travel:true,type:'rocky',parent:'earth',m:sphere(0.55,sm(TX.mercury,.7))},
-mars:{r:1.1,orb:74,w:.02,n:'Mars',travel:true,type:'rocky',m:sphere(1.1,sm(TX.mars,.6))},
-jupiter:{r:5.5,orb:115,w:.013,n:'Jupiter',travel:false,type:'gas',m:sphere(5.5,sm(TX.jupiter,.3))},
-saturn:{r:4.6,orb:165,w:.009,n:'Saturne',travel:false,type:'gas',m:sphere(4.6,sm(TX.saturn,.3)),rings:true},
-uranus:{r:1.8,orb:215,w:.006,n:'Uranus',travel:false,type:'ice',m:sphere(1.8,sm(TX.uranus,.2))},
-neptune:{r:1.6,orb:260,w:.005,n:'Neptune',travel:false,type:'ice',m:sphere(1.6,sm(TX.neptune,.2))}};
+const PL={sun:{r:14,orb:0,w:0,spin:.02,n:'Soleil',travel:false,type:'sun',m:sphere(14,new THREE.MeshBasicMaterial({map:TX.sun,color:0xffffff}))},
+mercury:{r:0.75,orb:24,w:.045,spin:.06,n:'Mercure',travel:false,type:'rocky',m:sphere(0.75,sm(TX.mercury,.5))},
+venus:{r:1.7,orb:36,w:.03,spin:.04,n:'Vénus',travel:false,type:'rocky',m:sphere(1.7,sm(TX.venus,.4))},
+earth:{r:2,orb:52,w:.025,spin:.05,n:'Terre',travel:true,type:'earth',m:sphere(2,sm(TX.earth,.6))},
+moon:{r:0.55,orb:5,w:.16,spin:.03,n:'Lune',travel:true,type:'rocky',parent:'earth',m:sphere(0.55,sm(TX.mercury,.7))},
+mars:{r:1.1,orb:74,w:.02,spin:.045,n:'Mars',travel:true,type:'rocky',m:sphere(1.1,sm(TX.mars,.6))},
+jupiter:{r:5.5,orb:115,w:.013,spin:.08,n:'Jupiter',travel:false,type:'gas',m:sphere(5.5,sm(TX.jupiter,.3))},
+saturn:{r:4.6,orb:165,w:.009,spin:.07,n:'Saturne',travel:false,type:'gas',m:sphere(4.6,sm(TX.saturn,.3)),rings:true},
+uranus:{r:1.8,orb:215,w:.006,spin:.05,n:'Uranus',travel:false,type:'ice',m:sphere(1.8,sm(TX.uranus,.2))},
+neptune:{r:1.6,orb:260,w:.005,spin:.05,n:'Neptune',travel:false,type:'ice',m:sphere(1.6,sm(TX.neptune,.2))}};
 const clouds=sphere(2.06,new THREE.MeshStandardMaterial({map:TX.clouds,transparent:true,depthWrite:false,roughness:1}));
 const sunGlow=new THREE.Sprite(new THREE.SpriteMaterial({map:glow,color:0xffd700,blending:AD,transparent:true,depthWrite:false}));sunGlow.scale.setScalar(40);S.add(sunGlow);
 S.add(new THREE.PointLight(0xfff0dd,2,3000),new THREE.HemisphereLight(0x9fb2ff,0x20120a,.1));
 const atm=(r,col)=>{const m=new THREE.Mesh(new THREE.SphereGeometry(r,64,48),new THREE.ShaderMaterial({uniforms:{uS:{value:new V3(1,0,0)},uC:{value:new THREE.Color(col)}},vertexShader:'varying vec3 N,W;void main(){N=normalize(mat3(modelMatrix)*normal);W=(modelMatrix*vec4(position,1.)).xyz;gl_Position=projectionMatrix*viewMatrix*vec4(W,1.);}',fragmentShader:'varying vec3 N,W;uniform vec3 uS,uC;void main(){vec3 V=normalize(cameraPosition-W);vec3 n=normalize(N);float f=pow(clamp(1.+dot(n,V),0.,1.),4.);float s=smoothstep(-.3,.55,dot(n,uS));float a=f*s;gl_FragColor=vec4(uC*a*1.8,a);}',side:THREE.BackSide,transparent:true,blending:AD,depthWrite:false}));S.add(m);return m};
 const aEarth=atm(2.15,'#5fb4ff');
 const saturnRing=(function(){const p=[];for(let i=0;i<=160;i++){const a=i/160*6.2832;p.push(new V3(Math.cos(a)*6.2,0,Math.sin(a)*6.2*.25))}const geo=new THREE.BufferGeometry().setFromPoints(p);const line=new THREE.LineLoop(geo,new THREE.LineBasicMaterial({color:0xd4af37,transparent:true,opacity:.35}));S.add(line);return line})();
-function pos(k,o){const b=PL[k];let a=b.a0||0;a+=b.w*T;b.a0=a;if(b.parent){pos(b.parent,o);o.x+=Math.cos(a)*b.orb;o.y+=Math.sin(a)*b.orb*.15;o.z+=Math.sin(a)*b.orb;return o}return o.set(Math.cos(a)*b.orb,0,Math.sin(a)*b.orb)}
+function pos(k,o){const b=PL[k];const a=b.w*T;if(b.parent){pos(b.parent,o);o.x+=Math.cos(a)*b.orb;o.y+=Math.sin(a)*b.orb*.15;o.z+=Math.sin(a)*b.orb;return o}return o.set(Math.cos(a)*b.orb,0,Math.sin(a)*b.orb)}
 const ring=(r,y)=>{const p=[];for(let i=0;i<=128;i++){const a=i/128*6.2832;p.push(new V3(Math.cos(a)*r,Math.sin(a)*r*y,Math.sin(a)*r))}const l=new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(p),new THREE.LineBasicMaterial({color:0x4a6a9a,transparent:true,opacity:.15}));S.add(l);return l};
 ring(24,0);ring(36,0);ring(52,0);ring(74,0);ring(115,0);ring(165,0);ring(215,0);ring(260,0);
 /* rocket (smaller, realistic) */
@@ -156,7 +156,7 @@ const LB=[['sun','Soleil'],['mercury','Mercure'],['venus','Vénus'],['earth','Te
 /* loop */
 function fr(now){requestAnimationFrame(fr);const dt=Math.min(.05,(now-last)/1e3);last=now;
 ts+=((F.st=='idle'?1:.1)-ts)*Math.min(1,dt*3);T+=dt*ts;
-for(const k in PL){pos(k,PL[k].m.position);PL[k].m.rotation.y+=PL[k].w*dt}
+for(const k in PL){pos(k,PL[k].m.position);PL[k].m.rotation.y+=PL[k].spin*dt}
 clouds.position.copy(PL.earth.m.position);clouds.rotation.y+=.16*dt;aEarth.position.copy(PL.earth.m.position);sunGlow.position.copy(PL.sun.m.position);saturnRing.position.copy(PL.saturn.m.position);saturnRing.rotation.y+=.009*dt;
 /* rocket */
 let x=0;
