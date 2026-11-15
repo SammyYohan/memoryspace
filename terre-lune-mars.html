@@ -124,7 +124,7 @@ const PTS=new THREE.Points(TPG,new THREE.PointsMaterial({map:glow,size:.35,verte
 /* sound */
 let AC,ng,nf,sOn=true;function snd(){if(AC||!window.AudioContext)return;try{AC=new AudioContext();const b=AC.createBuffer(1,AC.sampleRate*2,AC.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;const s=AC.createBufferSource();s.buffer=b;s.loop=true;nf=AC.createBiquadFilter();nf.type='lowpass';ng=AC.createGain();ng.gain.value=0;s.connect(nf);nf.connect(ng);ng.connect(AC.destination);s.start()}catch(e){AC=null}}
 /* state */
-const F={at:'earth',st:'idle',u:0,t:0,src:'',dst:'',dur:10,len:10,park:new V3(-.4,.6,.25).normalize(),park0:new V3(),park1:new V3()};
+const F={at:'earth',st:'idle',u:0,t:0,src:'',dst:'',dur:10,len:10,park:new V3(-.4,.6,.25).normalize(),park0:new V3(),park1:new V3(),endLen:0,endT:0,endSpd:0};
 const P0=new V3(),P1=new V3(),c1=new V3(),c2=new V3(),rp=new V3(),tg=new V3(),tA=new V3(),tB=new V3(),tC=new V3(),tD=new V3(),dd=new V3(),sd=new V3(),qq=new THREE.Quaternion();
 let T=0,ts=1,thrust=0,chaseOn=true,chase=true,focus='earth',fm=false,cdt='',act=0,last=performance.now(),spd=0;
 let yaw=-.9,pit=.35,dist=70,tY=yaw,tP=pit,tD_=dist;const fT=new V3(),cp=new V3(),lk=new V3();
@@ -166,7 +166,7 @@ sd.copy(P1).sub(P0).cross(UP).normalize().multiplyScalar(ln*.15);c1.copy(P0).add
 bez(u,rp);bez(Math.min(1,u+.003),tg).sub(rp);if(tg.lengthSq()<1e-9)tg.copy(F.park1).negate();tg.normalize();
 thrust=1-.5*ss(.8,1,u);spd=Math.sin(Math.PI*x);
 rk.visible=true;rk.position.copy(rp);rk.scale.setScalar(cl(cam.position.distanceTo(rp)/26,1,6));
-if(x>=1){F.at=F.dst;F.park.copy(F.park1);F.st='land';F.t=0;chase=false;sync();focus=F.at;fm=false;tD_=FD[focus];const m=MSG[F.at];$('bn').querySelector('h3').textContent=m[0];$('bn').querySelector('p').textContent=m[1];$('bn').classList.add('show');setTimeout(()=>$('bn').classList.remove('show'),6000);ui()}}
+if(x>=1){F.endLen=F.len;F.endT=F.dur;F.endSpd=40000;F.at=F.dst;F.park.copy(F.park1);F.st='land';F.t=0;chase=false;sync();focus=F.at;fm=false;tD_=FD[focus];const m=MSG[F.at];$('bn').querySelector('h3').textContent=m[0];$('bn').querySelector('p').textContent=m[1];$('bn').classList.add('show');setTimeout(()=>$('bn').classList.remove('show'),6000);ui()}}
 else{rk.visible=false;pos(F.at,tA);rp.copy(tA).addScaledVector(F.park,PL[F.at].r+.7);tg.copy(F.park);
 if(F.st=='count'){F.t+=dt;thrust=.15+.55*ss(0,3,F.t);spd=0;const n=F.t<1?'3':F.t<2?'2':F.t<3?'1':'Décollage !';if(n!=cdt){cdt=n;const e=$('cd');e.textContent=n;e.classList.remove('k');void e.offsetWidth;e.classList.add('k')}if(F.t>3.4){F.st='fly';F.t=0}}
 else{thrust=Math.max(0,thrust-dt*.9);spd=0;if(F.st=='land'){F.t+=dt;if(F.t>1.6){F.st='idle';tD_=FD[focus]*.8;tP=.45;ui()}}}}
@@ -190,7 +190,8 @@ cam.lookAt(lk);if(Math.abs(cam.fov-fov)>.05){cam.fov+=(fov-cam.fov)*Math.min(1,d
 const f=flying();$('vg').classList.toggle('on',f);
 if(f){const d=F.st=='fly'?F.u*14:0;$('ph').textContent=F.st=='count'?'Compte à rebours':F.u<.08?'Décollage':F.u<.2?'Montée':F.u<.8?'Croisière':F.u<.95?'Freinage':'Atterrissage';
 $('t1').textContent='T+ '+Math.floor(d)+' j '+Math.floor(d%1*24)+' h';$('t2').textContent=Math.round(F.len*(1-F.u))+' km';$('t3').textContent=Math.round(40000*(F.st=='fly'?.1+.9*spd:0)).toLocaleString('fr-FR')+' km/h';$('pg').style.width=F.u*100+'%'}
-else if(F.st=='land'){$('ph').textContent='Mission accomplie';$('pg').style.width='100%'}
+else if(F.st=='land'){$('ph').textContent='Mission accomplie';$('t1').textContent='T+ '+Math.floor(F.endT)+' j';$('t2').textContent=Math.round(F.endLen)+' km';$('t3').textContent=Math.round(F.endSpd).toLocaleString('fr-FR')+' km/h';$('pg').style.width='100%'}
+else if(F.endLen){$('ph').textContent='Dernier voyage terminé';$('t1').textContent='T+ '+Math.floor(F.endT)+' j';$('t2').textContent=Math.round(F.endLen)+' km';$('t3').textContent=Math.round(F.endSpd).toLocaleString('fr-FR')+' km/h';$('pg').style.width='100%'}
 else{$('ph').textContent='Prêt au décollage depuis '+PL[F.at].n;$('t1').textContent=$('t2').textContent=$('t3').textContent='–';$('pg').style.width='0'}
 if(ng&&sOn){const g=ng.gain.value;ng.gain.value=g+((f?.04+thrust*.3:0)-g)*.1;nf.frequency.value=150+thrust*900}
 R.render(S,cam);cam.updateMatrixWorld();
